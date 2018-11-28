@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/item_layout1"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/date"
+            tools:text="12th january 2018"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <RelativeLayout
+       android:id="@+id/item_layout2"
+        android:padding="16dp"
+        android:background="@color/cardBackground"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/item_layout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            tools:text="1"
+            android:id="@+id/serial"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/amt"
+            tools:text="N400"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:layout_below="@+id/serial"
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            tools:text="Confirmed"
+            android:id="@+id/status"
+            android:textStyle="bold"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/item_layout3"
+        android:visibility="gone"
+        android:layout_below="@+id/item_layout2"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="25dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="Total sales:"
+            android:id="@+id/total_sales_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            tools:text="23"
+            android:gravity="center"
+            android:id="@+id/total_sales"
+            android:layout_alignRight="@+id/total_sales_text"
+            android:layout_alignLeft="@+id/total_sales_text"
+            android:layout_alignEnd="@+id/total_sales_text"
+            android:layout_alignStart="@+id/total_sales_text"
+            android:layout_below="@+id/total_sales_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="Total amount:"
+            android:id="@+id/total_amt_text"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            tools:text="N2300"
+            android:gravity="center"
+            android:id="@+id/total_amt"
+            android:layout_alignRight="@+id/total_amt_text"
+            android:layout_alignLeft="@+id/total_amt_text"
+            android:layout_alignEnd="@+id/total_amt_text"
+            android:layout_alignStart="@+id/total_amt_text"
+            android:layout_below="@+id/total_amt_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+</RelativeLayout>

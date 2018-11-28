@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/item_layout1"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/date"
+            tools:text="12th january 2018"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <android.support.v7.widget.CardView
+        android:layout_below="@+id/item_layout1"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/item_layout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/cardBackground"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@drawable/rounded_corner"
+        app:cardElevation="5dp">
+        <ImageButton
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/delete"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/ic_close"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="end" />
+
+        <RelativeLayout
+            android:id="@+id/item_layout"
+            android:padding="7dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
+
+            <TextView
+                tools:text="1"
+                android:id="@+id/serial"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_centerHorizontal="true"
+                android:id="@+id/client_date_created"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Aug 20th 2018" />
+            <TextView
+                android:id="@+id/name"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="John Doe" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+    <RelativeLayout
+        android:id="@+id/item_layout3"
+        android:visibility="gone"
+        android:layout_below="@+id/item_layout2"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="25dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="Total clients:"
+            android:id="@+id/total_sales_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            tools:text="23"
+            android:gravity="center"
+            android:id="@+id/total_clients"
+            android:layout_alignRight="@+id/total_sales_text"
+            android:layout_alignLeft="@+id/total_sales_text"
+            android:layout_alignEnd="@+id/total_sales_text"
+            android:layout_alignStart="@+id/total_sales_text"
+            android:layout_below="@+id/total_sales_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="Total amount:"
+            android:id="@+id/total_amt_text"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            tools:text="N2300"
+            android:gravity="center"
+            android:id="@+id/total_amt"
+            android:layout_alignRight="@+id/total_amt_text"
+            android:layout_alignLeft="@+id/total_amt_text"
+            android:layout_alignEnd="@+id/total_amt_text"
+            android:layout_alignStart="@+id/total_amt_text"
+            android:layout_below="@+id/total_amt_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+</RelativeLayout>

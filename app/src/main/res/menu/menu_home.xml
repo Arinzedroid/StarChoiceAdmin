@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.tech.arinzedroid.starchoiceadmin.activity.HomeActivity">
+    <item
+        android:id="@+id/view_clients"
+        android:orderInCategory="100"
+        android:title="All Clients"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/view_transactions"
+        android:orderInCategory="100"
+        android:title="All Transactions"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/view_completed_products"
+        android:orderInCategory="100"
+        android:title="All Completed Payments"
+        app:showAsAction="never" />
+
+
+</menu>
