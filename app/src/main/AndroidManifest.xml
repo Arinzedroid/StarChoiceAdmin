@@ -33,7 +33,11 @@
         <activity android:name=".activity.TransactionActivity" />
         <activity android:name=".activity.ViewClientsActivity" />
         <activity android:name=".activity.CompletedPaymentsActivity" />
-        <activity android:name=".activity.ClientProfile"></activity>
+        <activity android:name=".activity.ClientProfile" />
+        <activity
+            android:name=".activity.AddProductActivity"
+            android:label="@string/title_activity_add_product"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

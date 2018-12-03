@@ -56,20 +56,20 @@ public class TransactionActivity extends AppCompatActivity implements SwipeRefre
             if(data != null){
                 isAllTransactions = false;
                 agentId = data.getId();
-                loadData(agentId);
+                loadData(agentId,false);
             }else{
                 isAllTransactions = true;
-                loadData();
+                loadData(false);
             }
         }else{
             isAllTransactions = true;
-            loadData();
+            loadData(false);
         }
     }
 
-    private void loadData(){
+    private void loadData(boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getAllTransactions().observe(this, data ->{
+        appViewModel.getAllTransactions(refresh).observe(this, data ->{
             swipeRefreshLayout.setRefreshing(false);
             if(data != null){
                 TransactionAdapter adapter = new TransactionAdapter(data);
@@ -77,9 +77,9 @@ public class TransactionActivity extends AppCompatActivity implements SwipeRefre
             }
         });
     }
-    private void loadData(String agentId){
+    private void loadData(String agentId, boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getAgentTransactions(agentId).observe(this, data ->{
+        appViewModel.getAgentTransactions(agentId,refresh).observe(this, data ->{
             swipeRefreshLayout.setRefreshing(false);
             if(data != null){
                 TransactionAdapter adapter = new TransactionAdapter(data);
@@ -91,8 +91,8 @@ public class TransactionActivity extends AppCompatActivity implements SwipeRefre
     @Override
     public void onRefresh() {
         if(isAllTransactions)
-            loadData();
+            loadData(true);
         else
-            loadData(agentId);
+            loadData(agentId,true);
     }
 }

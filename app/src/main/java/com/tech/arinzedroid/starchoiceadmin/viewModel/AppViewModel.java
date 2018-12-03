@@ -9,6 +9,7 @@ import com.tech.arinzedroid.starchoiceadmin.model.ClientsModel;
 import com.tech.arinzedroid.starchoiceadmin.model.CompletedProducts;
 import com.tech.arinzedroid.starchoiceadmin.model.ProductsModel;
 import com.tech.arinzedroid.starchoiceadmin.model.TransactionsModel;
+import com.tech.arinzedroid.starchoiceadmin.model.UserProductsModel;
 import com.tech.arinzedroid.starchoiceadmin.repo.AppRepo;
 
 import java.util.List;
@@ -18,6 +19,15 @@ import static com.tech.arinzedroid.starchoiceadmin.model.CompletedProducts.*;
 public class AppViewModel extends ViewModel {
 
     private AppRepo appRepo;
+    private LiveData<List<UserProductsModel>> userProductsList;
+    private LiveData<List<AgentsModel>> agentsLiveData;
+    private LiveData<List<ProductsModel>> productsModelLiveData;
+    private LiveData<List<TransactionsModel>> transactionLiveData;
+    private LiveData<List<TransactionsModel>> agentsTransactionLiveData;
+    private LiveData<List<ClientsModel>> allClientModelLiveData;
+    private LiveData<List<ClientsModel>> agentsClientsLiveData;
+    private LiveData<List<CompletedProducts>> completedProductsLiveDataList;
+
 
     public  AppViewModel(){
        appRepo = new AppRepo();
@@ -27,27 +37,56 @@ public class AppViewModel extends ViewModel {
         return appRepo.loginAdmin(username,password);
     }
 
-    public LiveData<List<AgentsModel>> getAllAgents(){
-        return appRepo.getAllAgents();
+    public LiveData<List<AgentsModel>> getAllAgents(boolean refresh){
+        if(refresh){
+            agentsLiveData = appRepo.getAllAgents();
+        }else{
+            if(agentsLiveData == null){
+                agentsLiveData = appRepo.getAllAgents();
+            }
+        }
+        return agentsLiveData;
     }
 
-    public LiveData<List<ProductsModel>> getAllProducts(){
-        return appRepo.getAllProducts();
+    public LiveData<List<ProductsModel>> getAllProducts(boolean refresh){
+        if(!refresh){
+            if(productsModelLiveData == null){
+                productsModelLiveData = appRepo.getAllProducts();
+            }
+        }else{
+            productsModelLiveData = appRepo.getAllProducts();
+        }
+        return productsModelLiveData;
     }
 
     public LiveData<Boolean> addAgents(AgentsModel agentsModel){
         return appRepo.addAgent(agentsModel);
     }
+
     public LiveData<Boolean> addProducts(ProductsModel productsModel){
         return appRepo.addProducts(productsModel);
     }
 
-    public LiveData<List<TransactionsModel>> getAllTransactions(){
-        return appRepo.getAllTransactions();
+    public LiveData<List<TransactionsModel>> getAllTransactions(boolean refresh){
+        if(!refresh){
+            if(transactionLiveData == null){
+                transactionLiveData = appRepo.getAllTransactions();
+            }
+        }else{
+            transactionLiveData = appRepo.getAllTransactions();
+        }
+        return transactionLiveData;
     }
 
-    public LiveData<List<TransactionsModel>> getAgentTransactions(String agentId){
-        return appRepo.getAgentTransactions(agentId);
+    public LiveData<List<TransactionsModel>> getAgentTransactions(String agentId, boolean refresh){
+        if(!refresh){
+            if(agentsTransactionLiveData == null){
+                agentsTransactionLiveData = appRepo.getAgentTransactions(agentId);
+            }
+        }else{
+            agentsTransactionLiveData = appRepo.getAgentTransactions(agentId);
+        }
+        return agentsTransactionLiveData;
     }
 
     public LiveData<Boolean> deleteAgent(AgentsModel agentsModel){
@@ -66,19 +105,59 @@ public class AppViewModel extends ViewModel {
         return appRepo.updateProduct(productsModel);
     }
 
-    public LiveData<List<ClientsModel>> getAllClients(){
-        return appRepo.getAllClients();
+    public LiveData<List<ClientsModel>> getAllClients(boolean refresh){
+        if(!refresh){
+            if(allClientModelLiveData == null){
+                allClientModelLiveData = appRepo.getAllClients();
+            }
+        }else{
+            allClientModelLiveData = appRepo.getAllClients();
+        }
+        return allClientModelLiveData;
     }
 
-    public LiveData<List<ClientsModel>> getAgentsClients(String agentId){
-        return appRepo.getAgentClients(agentId);
+    public LiveData<List<ClientsModel>> getAgentsClients(String agentId,boolean refresh){
+        if(!refresh){
+            if(agentsClientsLiveData == null){
+                agentsClientsLiveData = appRepo.getAgentClients(agentId);
+            }
+        }else{
+            agentsClientsLiveData = appRepo.getAgentClients(agentId);
+        }
+        return agentsClientsLiveData;
     }
 
     public LiveData<Boolean> deleteClients(ClientsModel clientsModel){
         return appRepo.deleteClient(clientsModel);
     }
 
-   public LiveData<List<CompletedProducts>> getCompletedProducts(){
-        return appRepo.getCompletedProducts();
+    public LiveData<Boolean> deleteUserProduct(UserProductsModel userProductsModel){
+        return appRepo.deleteUserProduct(userProductsModel);
+    }
+
+   public LiveData<List<CompletedProducts>> getCompletedProducts(boolean refresh){
+        if(!refresh){
+            if(completedProductsLiveDataList == null){
+                completedProductsLiveDataList = appRepo.getCompletedProducts();
+            }
+        }else{
+            completedProductsLiveDataList = appRepo.getCompletedProducts();
+        }
+        return completedProductsLiveDataList;
+   }
+
+   public LiveData<List<UserProductsModel>> getUserProducts(String userId, boolean refresh){
+        if(!refresh){
+            if(userProductsList == null){
+                userProductsList = appRepo.getUserProducts(userId);
+            }
+        }else{
+            userProductsList = appRepo.getUserProducts(userId);
+        }
+        return userProductsList;
+   }
+
+   public LiveData<Boolean> addUserProducts(List<UserProductsModel> userProductsModels){
+        return appRepo.addUserProducts(userProductsModels);
    }
 }

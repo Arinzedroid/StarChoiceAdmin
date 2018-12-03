@@ -2,7 +2,6 @@ package com.tech.arinzedroid.starchoiceadmin.activity;
 
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,8 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.tech.arinzedroid.starchoiceadmin.R;
 import com.tech.arinzedroid.starchoiceadmin.adapter.SectionsPagerAdapter;
-import com.tech.arinzedroid.starchoiceadmin.fragment.AgentsFragment;
-import com.tech.arinzedroid.starchoiceadmin.fragment.ProductsFragment;
 import com.tech.arinzedroid.starchoiceadmin.utils.Constants;
 
 

@@ -2,10 +2,11 @@ package com.tech.arinzedroid.starchoiceadmin.viewHolder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tech.arinzedroid.starchoiceadmin.R;
-import com.tech.arinzedroid.starchoiceadmin.interfaces.ProductItemClickedInterface;
+import com.tech.arinzedroid.starchoiceadmin.interfaces.RemoveProductInterface;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,27 +17,21 @@ public class ProductsViewHolder extends RecyclerView.ViewHolder implements View.
     public TextView nameTv;
     @BindView(R.id.price)
     public TextView priceTv;
-    @BindView(R.id.date)
-    public TextView dateTv;
-    @BindView(R.id.status)
-    public TextView statusTv;
-    @BindView(R.id.serial)
-    public TextView serialTv;
-    @BindView(R.id.item_layout)
-    View layout;
+    @BindView(R.id.remove)
+    ImageButton removeButton;
 
-    private ProductItemClickedInterface productItemClickedInterface;
+    private RemoveProductInterface removeProductInterface;
 
-    public ProductsViewHolder(View itemView, ProductItemClickedInterface productItemClickedInterface) {
+    public ProductsViewHolder(View itemView, RemoveProductInterface removeProductInterface) {
         super(itemView);
         ButterKnife.bind(this,itemView);
-        layout.setOnClickListener(this);
-        this.productItemClickedInterface = productItemClickedInterface;
+        removeButton.setOnClickListener(this);
+        this.removeProductInterface = removeProductInterface;
     }
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.item_layout)
-            productItemClickedInterface.onClick(this.getLayoutPosition());
+        if(v.getId() == R.id.remove)
+            removeProductInterface.removeProduct(this.getLayoutPosition());
     }
 }

@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.tech.arinzedroid.starchoiceadmin.fragment.AgentsFragment;
-import com.tech.arinzedroid.starchoiceadmin.fragment.ProductsFragment;
+import com.tech.arinzedroid.starchoiceadmin.fragment.AllProductsFragment;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -20,7 +20,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         if(position == 0){
             return AgentsFragment.newInstance(adminName);
         }else{
-            return ProductsFragment.newInstance(adminName);
+            return AllProductsFragment.newInstance(adminName);
         }
     }
 

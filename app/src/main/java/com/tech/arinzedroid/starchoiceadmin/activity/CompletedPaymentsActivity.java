@@ -43,12 +43,12 @@ public class CompletedPaymentsActivity extends AppCompatActivity implements Swip
                 android.R.color.holo_blue_dark);
 
         appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
-        loadData();
+        loadData(false);
     }
 
-    private void loadData(){
+    private void loadData(boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getCompletedProducts().observe(this, completedProductsList -> {
+        appViewModel.getCompletedProducts(refresh).observe(this, completedProductsList -> {
             swipeRefreshLayout.setRefreshing(false);
             if(completedProductsList != null && !completedProductsList.isEmpty()){
                 completedProductsAdapter = new CompletedProductsAdapter(completedProductsList);
@@ -60,6 +60,6 @@ public class CompletedPaymentsActivity extends AppCompatActivity implements Swip
 
     @Override
     public void onRefresh() {
-        loadData();
+        loadData(true);
     }
 }

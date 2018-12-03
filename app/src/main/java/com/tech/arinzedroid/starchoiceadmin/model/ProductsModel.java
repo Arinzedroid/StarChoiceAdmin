@@ -62,4 +62,9 @@ public class ProductsModel {
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
     }
+
+    @Override
+    public String toString(){
+        return productName;
+    }
 }

@@ -3,7 +3,6 @@ package com.tech.arinzedroid.starchoiceadmin.fragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,13 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tech.arinzedroid.starchoiceadmin.R;
 import com.tech.arinzedroid.starchoiceadmin.activity.RegisterProductActivity;
-import com.tech.arinzedroid.starchoiceadmin.adapter.ProductsAdapter;
+import com.tech.arinzedroid.starchoiceadmin.adapter.AllProductsAdapter;
 import com.tech.arinzedroid.starchoiceadmin.interfaces.ProductItemClickedInterface;
 import com.tech.arinzedroid.starchoiceadmin.model.ProductsModel;
 import com.tech.arinzedroid.starchoiceadmin.utils.Constants;
@@ -32,7 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ProductsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
+public class AllProductsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
         ProductItemClickedInterface{
 
     @BindView(R.id.recycler_view)
@@ -46,18 +43,18 @@ public class ProductsFragment extends Fragment implements SwipeRefreshLayout.OnR
 
 
     private String adminName = "";
-    private ProductsAdapter productsAdapter;
+    private AllProductsAdapter allProductsAdapter;
     private AppViewModel appViewModel;
     private List<ProductsModel> productsModel;
 
 
-    public ProductsFragment() {
+    public AllProductsFragment() {
         // Required empty public constructor
     }
 
 
-    public static ProductsFragment newInstance(String adminName) {
-        ProductsFragment fragment = new ProductsFragment();
+    public static AllProductsFragment newInstance(String adminName) {
+        AllProductsFragment fragment = new AllProductsFragment();
         Bundle args = new Bundle();
         args.putString(Constants.ADMIN_NAME,adminName);
         fragment.setArguments(args);
@@ -89,23 +86,23 @@ public class ProductsFragment extends Fragment implements SwipeRefreshLayout.OnR
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
 
-        loadData();
+        loadData(false);
 
         return v;
     }
 
-    private void loadData(){
+    private void loadData(boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getAllProducts().observe(this, productsModels -> {
+        appViewModel.getAllProducts(refresh).observe(this, productsModels -> {
            swipeRefreshLayout.setRefreshing(false);
            if(productsModels != null){
                noDataTv.setVisibility(View.GONE);
                this.productsModel = productsModels;
-               if(productsAdapter != null){
-                   productsAdapter.addAll(productsModels);
+               if(allProductsAdapter != null){
+                   allProductsAdapter.addAll(productsModels);
                }else{
-                   productsAdapter = new ProductsAdapter(productsModels, this);
-                   recyclerView.setAdapter(productsAdapter);
+                   allProductsAdapter = new AllProductsAdapter(productsModels, this);
+                   recyclerView.setAdapter(allProductsAdapter);
                }
            }else noDataTv.setVisibility(View.VISIBLE);
         });
@@ -128,7 +125,7 @@ public class ProductsFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Override
     public void onRefresh() {
-        loadData();
+        loadData(true);
     }
 
     @Override

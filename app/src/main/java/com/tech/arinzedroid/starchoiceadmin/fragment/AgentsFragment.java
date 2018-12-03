@@ -90,14 +90,14 @@ public class AgentsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
 
-        loadData();
+        loadData(false);
 
         return v;
     }
 
-    private void loadData(){
+    private void loadData(boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getAllAgents().observe(this, agents -> {
+        appViewModel.getAllAgents(refresh).observe(this, agents -> {
             swipeRefreshLayout.setRefreshing(false);
             if(agents != null){
                 agentsModelList = agents;
@@ -131,7 +131,7 @@ public class AgentsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Override
     public void onRefresh() {
-        loadData();
+        loadData(true);
     }
 
     @Override

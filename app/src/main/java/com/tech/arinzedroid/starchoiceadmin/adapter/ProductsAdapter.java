@@ -7,9 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tech.arinzedroid.starchoiceadmin.R;
-import com.tech.arinzedroid.starchoiceadmin.interfaces.ProductItemClickedInterface;
+import com.tech.arinzedroid.starchoiceadmin.interfaces.RemoveProductInterface;
 import com.tech.arinzedroid.starchoiceadmin.model.ProductsModel;
-import com.tech.arinzedroid.starchoiceadmin.utils.DateTimeUtils;
 import com.tech.arinzedroid.starchoiceadmin.utils.FormatUtil;
 import com.tech.arinzedroid.starchoiceadmin.viewHolder.ProductsViewHolder;
 
@@ -17,44 +16,42 @@ import java.util.List;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsViewHolder> {
 
-    private List<ProductsModel> productsModelList;
-    private ProductItemClickedInterface productItemClickedInterface; private int count;
+    private List<ProductsModel> productModelList;
+    private RemoveProductInterface removeProductInterface;
 
-    public ProductsAdapter(List<ProductsModel> productsModels,
-                           ProductItemClickedInterface productItemClickedInterface){
-        this.productsModelList = productsModels; count = productsModelList.size();
-        this.productItemClickedInterface = productItemClickedInterface;
+    public ProductsAdapter(List<ProductsModel> productModels, RemoveProductInterface removeProductInterface){
+        this.productModelList = productModels;
+        this.removeProductInterface = removeProductInterface;
+        setHasStableIds(true);
     }
 
-    public void addAll(List<ProductsModel> data){
-        productsModelList.clear();
-        productsModelList.addAll(data); count = productsModelList.size();
-        notifyDataSetChanged();
+    public void addProduct(ProductsModel productModel){
+        this.productModelList.add(productModel);
+        notifyItemInserted(this.productModelList.size() - 1);
+    }
+
+    public void removeProduct(int position){
+        productModelList.remove(position);
+        notifyItemRemoved(position);
+        //notifyItemRangeChanged(position,productModelList.size());
     }
 
     @NonNull
     @Override
     public ProductsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.items_products,parent,false);
-        return new ProductsViewHolder(v,productItemClickedInterface);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_items,parent,false);
+        return new ProductsViewHolder(v,removeProductInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductsViewHolder holder, int position) {
-        ProductsModel data = productsModelList.get(position);
-        holder.dateTv.setText(DateTimeUtils.parseDateTime(data.getDateCreated()));
+        ProductsModel data = productModelList.get(position);
         holder.nameTv.setText(data.getProductName());
-        holder.serialTv.setText(String.valueOf(count - position));
-
-        if(data.isActive())
-            holder.statusTv.setText(String.valueOf("active"));
-        else holder.statusTv.setText(String.valueOf("inactive"));
-
         holder.priceTv.setText(FormatUtil.formatPrice(data.getPrice()));
     }
 
     @Override
     public int getItemCount() {
-        return productsModelList.size();
+        return productModelList.size();
     }
 }

@@ -14,6 +14,7 @@ import com.tech.arinzedroid.starchoiceadmin.model.ClientsModel;
 import com.tech.arinzedroid.starchoiceadmin.model.CompletedProducts;
 import com.tech.arinzedroid.starchoiceadmin.model.ProductsModel;
 import com.tech.arinzedroid.starchoiceadmin.model.TransactionsModel;
+import com.tech.arinzedroid.starchoiceadmin.model.UserProductsModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ public class AppRepo {
     private static final String PRODUCTS_TABLE_NAME = "PRODUCTS";
     private static final String USER_PRODUCTS = "USER_PRODUCTS";
     private static final String ADMIN_TABLE_NAME = "ADMINS";
+    private static final String DATE_CREATED = "dateCreated";
 
     public LiveData<AdminModel> loginAdmin(String username, String password){
         final MutableLiveData<AdminModel> adminModelMutableLiveData = new MutableLiveData<>();
@@ -154,6 +156,15 @@ public class AppRepo {
     public LiveData<Boolean> deleteProduct(ProductsModel productsModel){
         final MutableLiveData<Boolean> isSuccessful = new MutableLiveData<>();
         firestoreDb.collection(PRODUCTS_TABLE_NAME).document(productsModel.getId())
+                .delete()
+                .addOnSuccessListener(task -> isSuccessful.postValue(true))
+                .addOnFailureListener(task -> isSuccessful.postValue(false));
+        return isSuccessful;
+    }
+
+    public LiveData<Boolean> deleteUserProduct(UserProductsModel userProductsModel){
+        MutableLiveData<Boolean> isSuccessful = new MutableLiveData<>();
+        firestoreDb.collection(USER_PRODUCTS).document(userProductsModel.getId())
                 .delete()
                 .addOnSuccessListener(task -> isSuccessful.postValue(true))
                 .addOnFailureListener(task -> isSuccessful.postValue(false));
@@ -306,6 +317,40 @@ public class AppRepo {
                     }
                 });
         return mutableLiveData;
+    }
+
+    public LiveData<List<UserProductsModel>> getUserProducts(String userId){
+        final MutableLiveData<List<UserProductsModel>> userProductsModelMutableLiveData = new MutableLiveData<>();
+        List<UserProductsModel> userProductsModels = new ArrayList<>();
+        firestoreDb.collection(USER_PRODUCTS)
+                .whereEqualTo("userId",userId)
+                .orderBy(DATE_CREATED,Query.Direction.DESCENDING)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        QuerySnapshot dc = task.getResult();
+                        Object vb = dc.getDocuments();
+                        for(QueryDocumentSnapshot doc : task.getResult()){
+                            userProductsModels.add(doc.toObject(UserProductsModel.class));
+                        }
+                        userProductsModelMutableLiveData.postValue(userProductsModels);
+                    }else{
+                        userProductsModelMutableLiveData.postValue(null);
+                        Log.e(this.getClass().getSimpleName(),"Error on getUserProducts", task.getException());
+                    }
+                });
+        return userProductsModelMutableLiveData;
+    }
+
+    public LiveData<Boolean> addUserProducts(List<UserProductsModel> userProductsModelList){
+        final MutableLiveData<Boolean> success = new MutableLiveData<>();
+        for(UserProductsModel data : userProductsModelList){
+            firestoreDb.collection(USER_PRODUCTS).document(data.getId())
+                    .set(data)
+                    .addOnSuccessListener(docRef -> success.postValue(true))
+                    .addOnFailureListener(ex -> success.postValue(false));
+        }
+        return success;
     }
 
 }

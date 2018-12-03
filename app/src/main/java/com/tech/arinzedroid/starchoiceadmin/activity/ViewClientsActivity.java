@@ -65,20 +65,20 @@ public class ViewClientsActivity extends AppCompatActivity implements
             agentsModel = Parcels.unwrap(intent.getParcelableExtra(Constants.AGENT_DATA));
             if(agentsModel != null){
                 isAllClients = false;
-                loadData(agentsModel.getId());
+                loadData(agentsModel.getId(),false);
             }else {
                 isAllClients = true;
-                loadData();
+                loadData(false);
             }
         }else {
             isAllClients = true;
-            loadData();
+            loadData(false);
         }
     }
 
-    private void loadData(){
+    private void loadData(boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getAllClients().observe(this, clientsModels -> {
+        appViewModel.getAllClients(refresh).observe(this, clientsModels -> {
             swipeRefreshLayout.setRefreshing(false);
             if(clientsModels != null){
                 this.clientsModelList = clientsModels;
@@ -90,9 +90,9 @@ public class ViewClientsActivity extends AppCompatActivity implements
         });
     }
 
-    private void loadData(String agentId){
+    private void loadData(String agentId, boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getAgentsClients(agentId).observe(this, clientsModels -> {
+        appViewModel.getAgentsClients(agentId,refresh).observe(this, clientsModels -> {
             swipeRefreshLayout.setRefreshing(false);
             if(clientsModels != null){
                 this.clientsModelList = clientsModels;
@@ -110,8 +110,8 @@ public class ViewClientsActivity extends AppCompatActivity implements
 
     private void refreshData() {
         if(isAllClients)
-            loadData();
-        else loadData(agentsModel.getId());
+            loadData(true);
+        else loadData(agentsModel.getId(),true);
     }
 
     @Override
@@ -134,5 +134,10 @@ public class ViewClientsActivity extends AppCompatActivity implements
     @Override
     public void client(int position) {
         Toast.makeText(this, "client item at " + position + " selected", Toast.LENGTH_SHORT).show();
+        if(clientsModelList != null && !clientsModelList.isEmpty() && clientsModelList.size() > position){
+            Intent intent = new Intent(this,ClientProfile.class);
+            intent.putExtra(Constants.CLIENT_DATA,Parcels.wrap(clientsModelList.get(position)));
+            startActivity(intent);
+        }
     }
 }
