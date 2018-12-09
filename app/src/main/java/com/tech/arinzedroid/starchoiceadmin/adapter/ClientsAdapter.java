@@ -20,16 +20,23 @@ import java.util.List;
 
 public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
 
-    private List<ClientsModel> clientsModelList;
+    private List<ClientsModel> _clientsModelList;
     private DeleteClientInterface deleteClientInterface;
     private ClientItemClickedInterface clientItemClickedInterface;
     private int total = 0; private double totalAmt = 0; private Date date; private int count;
 
     public ClientsAdapter(List<ClientsModel> clientsModelsList, DeleteClientInterface deleteClientInterface,
                           ClientItemClickedInterface clientItemClickedInterface){
-        this.clientsModelList = clientsModelsList; count = clientsModelsList.size();
+        this._clientsModelList = clientsModelsList; count = clientsModelsList.size();
         this.deleteClientInterface = deleteClientInterface;
         this.clientItemClickedInterface = clientItemClickedInterface;
+    }
+
+    public void addAll(List<ClientsModel> clientsModels){
+        _clientsModelList.clear();
+        _clientsModelList.addAll(clientsModels);
+        count = clientsModels.size();
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -45,7 +52,7 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
     }
 
     private void computeAndDisplayViews(ClientViewHolder holder, int position){
-        ClientsModel data = clientsModelList.get(position);
+        ClientsModel data = _clientsModelList.get(position);
         holder.nameTv.setText(data.getFullname());
         holder.clientDateCreatedTv.setText(DateTimeUtils.parseDateTime(data.getDateCreated()));
         holder.serialTv.setText(String.valueOf(count - position));
@@ -73,8 +80,8 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
     }
 
     private void displayTotalsView(ClientViewHolder holder, int position, ClientsModel data) {
-        if(clientsModelList.size() > position + 1){
-            ClientsModel data2 = clientsModelList.get(position + 1);
+        if(_clientsModelList.size() > position + 1){
+            ClientsModel data2 = _clientsModelList.get(position + 1);
             try{
                 if(DateTimeUtils.isDateBefore(data2.getDateCreated(),data.getDateCreated())){
                     holder.totalAmtTv.setText(FormatUtil.formatPrice(totalAmt));
@@ -95,6 +102,6 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
 
     @Override
     public int getItemCount() {
-        return clientsModelList.size();
+        return _clientsModelList.size();
     }
 }

@@ -27,7 +27,8 @@ public class AgentsAdapter extends RecyclerView.Adapter<AgentsViewHolder> {
 
     public void addAll(List<AgentsModel> data){
         agentsModelsList.clear();
-        agentsModelsList.addAll(data); count = agentsModelsList.size();
+        agentsModelsList.addAll(data);
+        count = agentsModelsList.size();
         notifyDataSetChanged();
     }
 

@@ -4,12 +4,15 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +32,9 @@ import com.tech.arinzedroid.starchoiceadmin.viewModel.AppViewModel;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +52,7 @@ public class AgentsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private AgentsAdapter agentsAdapter;
     private String adminName = "";
     private List<AgentsModel> agentsModelList;
+    private List<AgentsModel> searchedAgentModelList;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -68,7 +74,7 @@ public class AgentsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
+        appViewModel = ViewModelProviders.of(getActivity()).get(AppViewModel.class);
         if(getArguments() != null){
             adminName = getArguments().getString("name");
         }
@@ -95,12 +101,37 @@ public class AgentsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         return v;
     }
 
+    private void onSearchQuery(){
+        appViewModel.getQuery().observe(this, query -> {
+            if(this.getUserVisibleHint()){
+                if(!TextUtils.isEmpty(query)){
+                    if(agentsModelList != null && !agentsModelList.isEmpty()){
+                        List<AgentsModel> agentsModels = new ArrayList<>();
+                        for(AgentsModel agents : agentsModelList){
+                            if(agents.getLastname().toLowerCase().contains(query.toLowerCase()) ||
+                                    agents.getFirstname().toLowerCase().contains(query.toLowerCase())){
+                                agentsModels.add(agents);
+                            }
+                        }
+                        searchedAgentModelList = agentsModels;
+                        agentsAdapter = new AgentsAdapter(agentsModels,this);
+                        recyclerView.setAdapter(agentsAdapter);
+                    }
+                }else{
+                    searchedAgentModelList = agentsModelList;
+                   agentsAdapter.addAll(agentsModelList);
+                }
+            }
+        });
+    }
+
     private void loadData(boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
         appViewModel.getAllAgents(refresh).observe(this, agents -> {
             swipeRefreshLayout.setRefreshing(false);
             if(agents != null){
                 agentsModelList = agents;
+                searchedAgentModelList = agents;
                 noDataTv.setVisibility(View.GONE);
                 if(agentsAdapter == null){
                     agentsAdapter = new AgentsAdapter(agents,this);
@@ -108,6 +139,7 @@ public class AgentsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }else{
                     agentsAdapter.addAll(agents);
                 }
+                onSearchQuery();
             }else{
                 noDataTv.setVisibility(View.VISIBLE);
             }
@@ -136,11 +168,11 @@ public class AgentsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Override
     public void onClick(int position) {
-        if(agentsModelList != null && !agentsModelList.isEmpty() && agentsModelList.size() > position){
+        if(searchedAgentModelList != null && !searchedAgentModelList.isEmpty() && searchedAgentModelList.size() > position){
             Intent intent = new Intent(getActivity(), ViewAgentActivity.class);
-            intent.putExtra(Constants.AGENT_DATA, Parcels.wrap(agentsModelList.get(position)));
+            intent.putExtra(Constants.AGENT_DATA, Parcels.wrap(searchedAgentModelList.get(position)));
             startActivity(intent);
         }else
-            Log.e("AgentFragment", "Error on onClick");
+            Toast.makeText(getContext(), "Invalid agent selected", Toast.LENGTH_SHORT).show();
     }
 }

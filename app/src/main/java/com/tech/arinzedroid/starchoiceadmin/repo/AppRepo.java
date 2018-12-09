@@ -59,7 +59,7 @@ public class AppRepo {
         final MutableLiveData<List<AgentsModel>> agentMutableLiveData = new MutableLiveData<>();
         List<AgentsModel> agentsModelsList = new ArrayList<>();
         firestoreDb.collection(AGENT_TABLE_NAME)
-                .orderBy("dateCreated", Query.Direction.DESCENDING)
+                .orderBy(DATE_CREATED, Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
@@ -85,7 +85,7 @@ public class AppRepo {
         final MutableLiveData<List<ProductsModel>> productsModelMutableLiveData = new MutableLiveData<>();
         List<ProductsModel> productsModelList = new ArrayList<>();
         firestoreDb.collection(PRODUCTS_TABLE_NAME)
-                .orderBy("dateCreated", Query.Direction.DESCENDING)
+                .orderBy(DATE_CREATED, Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                    if(task.isSuccessful()){
@@ -191,11 +191,31 @@ public class AppRepo {
 
     }
 
+    public LiveData<Boolean> updateTransactionItem(TransactionsModel transactionsModel){
+        final MutableLiveData<Boolean> isSuccessful = new MutableLiveData<>();
+        Map<String,Object> data = new HashMap<>();
+        data.put("amount",transactionsModel.getAmount());
+        firestoreDb.collection(TRANS_HISTORY_TABLE).document(transactionsModel.getId())
+                .update(data)
+                .addOnSuccessListener(task -> isSuccessful.postValue(true))
+                .addOnFailureListener(task -> isSuccessful.postValue(false));
+        return isSuccessful;
+    }
+
+    public LiveData<Boolean> deleteTransactionItem(TransactionsModel transactionsModel){
+        final MutableLiveData<Boolean> isSuccessful = new MutableLiveData<>();
+        firestoreDb.collection(TRANS_HISTORY_TABLE).document(transactionsModel.getId())
+                .delete()
+                .addOnSuccessListener(task -> isSuccessful.postValue(true))
+                .addOnFailureListener(task -> isSuccessful.postValue(false));
+        return isSuccessful;
+    }
+
     public LiveData<List<TransactionsModel>> getAllTransactions(){
         final MutableLiveData<List<TransactionsModel>> listMutableLiveData = new MutableLiveData<>();
         final List<TransactionsModel> transactionsModelsList = new ArrayList<>();
         firestoreDb.collection(TRANS_HISTORY_TABLE)
-                .orderBy("dateCreated", Query.Direction.DESCENDING)
+                .orderBy(DATE_CREATED, Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
@@ -216,12 +236,11 @@ public class AppRepo {
     }
 
     public LiveData<List<TransactionsModel>> getAgentTransactions(String agentId){
-        Log.e("AgentId", agentId);
         final MutableLiveData<List<TransactionsModel>> listMutableLiveData = new MutableLiveData<>();
         final List<TransactionsModel> transactionsModelsList = new ArrayList<>();
         firestoreDb.collection(TRANS_HISTORY_TABLE)
                 .whereEqualTo("agentId",agentId)
-                .orderBy("dateCreated", Query.Direction.DESCENDING)
+                .orderBy(DATE_CREATED, Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
@@ -245,7 +264,7 @@ public class AppRepo {
         final MutableLiveData<List<ClientsModel>> clientMutableLivedata = new MutableLiveData<>();
         final List<ClientsModel> clientsModelList = new ArrayList<>();
         firestoreDb.collection(CLIENT_TABLE_NAME)
-                .orderBy("dateCreated", Query.Direction.DESCENDING)
+                .orderBy(DATE_CREATED, Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
@@ -268,7 +287,7 @@ public class AppRepo {
         final MutableLiveData<List<ClientsModel>> clientMutableLivedata = new MutableLiveData<>();
         final List<ClientsModel> clientsModelList = new ArrayList<>();
         firestoreDb.collection(CLIENT_TABLE_NAME)
-                .orderBy("dateCreated", Query.Direction.DESCENDING)
+                .orderBy(DATE_CREATED, Query.Direction.DESCENDING)
                 .whereEqualTo("agentId",agentId)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -328,8 +347,6 @@ public class AppRepo {
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
-                        QuerySnapshot dc = task.getResult();
-                        Object vb = dc.getDocuments();
                         for(QueryDocumentSnapshot doc : task.getResult()){
                             userProductsModels.add(doc.toObject(UserProductsModel.class));
                         }
@@ -351,6 +368,48 @@ public class AppRepo {
                     .addOnFailureListener(ex -> success.postValue(false));
         }
         return success;
+    }
+
+    public LiveData<List<TransactionsModel>> getUserTransactionsByProduct(String productId){
+        final MutableLiveData<List<TransactionsModel>> mutableLiveData = new MutableLiveData<>();
+        List<TransactionsModel> transactionsModels = new ArrayList<>();
+        firestoreDb.collection(TRANS_HISTORY_TABLE)
+                .whereEqualTo("productId",productId)
+                .orderBy(DATE_CREATED,Query.Direction.DESCENDING)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        for(QueryDocumentSnapshot doc : task.getResult()){
+                            transactionsModels.add(doc.toObject(TransactionsModel.class));
+                        }
+                        mutableLiveData.postValue(transactionsModels);
+                    }else{
+                        mutableLiveData.postValue(null);
+                        Log.e(this.getClass().getSimpleName(),"Error >> " + task.getException());
+                    }
+                });
+        return mutableLiveData;
+    }
+
+    public LiveData<Boolean> updateClient(ClientsModel clientsModel){
+        final MutableLiveData<Boolean> isSuccessful = new MutableLiveData<>();
+
+        Map<String,Object> data = new HashMap<>();
+        data.put("fullname",clientsModel.getFullname());
+        data.put("address",clientsModel.getAddress());
+        data.put("picUrl", clientsModel.getPicUrl());
+        data.put("phone",clientsModel.getPhone());
+        data.put("dateUpdated",clientsModel.getDateUpdated());
+        data.put("kinName",clientsModel.getKinName());
+        data.put("kinAddress",clientsModel.getKinAddress());
+        data.put("kinPhone",clientsModel.getKinPhone());
+
+        firestoreDb.collection(CLIENT_TABLE_NAME).document(clientsModel.getId())
+                .update(data)
+                .addOnSuccessListener(task -> isSuccessful.postValue(true))
+                .addOnFailureListener(task -> isSuccessful.postValue(false));
+
+        return isSuccessful;
     }
 
 }

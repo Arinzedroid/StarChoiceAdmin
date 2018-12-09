@@ -48,6 +48,10 @@ public class ConfirmDialogFragment extends DialogFragment {
             OnButtonClickInterface.onDeleteClicked(position);
             dismiss();
         });
+        v.findViewById(R.id.view_btn).setOnClickListener(view -> {
+            OnButtonClickInterface.onViewClicked(position);
+            dismiss();
+        });
         return v;
     }
 
@@ -72,5 +76,6 @@ public class ConfirmDialogFragment extends DialogFragment {
 
     public interface OnButtonClickInterface {
         void onDeleteClicked(int position);
+        void onViewClicked(int position);
     }
 }

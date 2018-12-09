@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -151,6 +152,23 @@ public class ClientProfile extends AppCompatActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_edit,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem){
+        if(menuItem.getItemId() == R.id.edit_btn){
+            Intent intent = new Intent(this, CreateClientActivity.class);
+            intent.putExtra(Constants.CLIENT_DATA,Parcels.wrap(clientsModel));
+            startActivity(intent);
+            finish();
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
+    @Override
     public void onProductClick(int position) {
         if(userProductsModelList != null && !userProductsModelList.isEmpty() &&
                 userProductsModelList.size() > position){
@@ -175,5 +193,13 @@ public class ClientProfile extends AppCompatActivity implements
                 Toast.makeText(this, "Product deletion failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onViewClicked(int position) {
+        Intent intent = new Intent(this,TransactionActivity.class);
+        intent.putExtra(Constants.IS_EDIT,true);
+        intent.putExtra(Constants.PRODUCT_DATA, Parcels.wrap(userProductsModelList.get(position)));
+        startActivity(intent);
     }
 }

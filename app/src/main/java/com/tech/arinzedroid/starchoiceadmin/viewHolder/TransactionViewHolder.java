@@ -5,11 +5,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tech.arinzedroid.starchoiceadmin.R;
+import com.tech.arinzedroid.starchoiceadmin.interfaces.TransactionItemClickedInterface;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TransactionViewHolder extends RecyclerView.ViewHolder {
+public class TransactionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
     @BindView(R.id.item_layout1)
     public View itemsLayout1;
@@ -30,8 +31,21 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.serial)
     public TextView serialTv;
 
-    public TransactionViewHolder(View itemView) {
+
+    private TransactionItemClickedInterface transactionItemClickedInterface;
+
+    public TransactionViewHolder(View itemView,
+                                 TransactionItemClickedInterface transactionItemClickedInterface) {
         super(itemView);
         ButterKnife.bind(this,itemView);
+        this.transactionItemClickedInterface = transactionItemClickedInterface;
+        itemsLayout2.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == itemsLayout2){
+            transactionItemClickedInterface.TransactionItem(this.getLayoutPosition());
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tech.arinzedroid.starchoiceadmin.R;
+import com.tech.arinzedroid.starchoiceadmin.interfaces.TransactionItemClickedInterface;
 import com.tech.arinzedroid.starchoiceadmin.model.TransactionsModel;
 import com.tech.arinzedroid.starchoiceadmin.utils.DateTimeUtils;
 import com.tech.arinzedroid.starchoiceadmin.utils.FormatUtil;
@@ -19,19 +20,21 @@ import java.util.List;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHolder> {
 
     private List<TransactionsModel> transactionsModelsList;
-    private Date date;
+    private Date date; private TransactionItemClickedInterface transactionItemClickedInterface;
     private double totalAmt = 0; private int total = 0,count;
 
-    public TransactionAdapter(List<TransactionsModel> transactionsModelsList){
+    public TransactionAdapter(List<TransactionsModel> transactionsModelsList,
+                              TransactionItemClickedInterface transactionItemClickedInterface){
         this.transactionsModelsList = transactionsModelsList;
         count = transactionsModelsList.size();
+        this.transactionItemClickedInterface = transactionItemClickedInterface;
     }
 
     @NonNull
     @Override
     public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.items_transactions,parent,false);
-        return new TransactionViewHolder(v);
+        return new TransactionViewHolder(v,transactionItemClickedInterface);
     }
 
     @Override
@@ -86,6 +89,21 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHold
             holder.totalSalesTv.setText(String.valueOf(total));
             holder.itemsLayout3.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void updateTransaction(int position, TransactionsModel transactionsModel){
+       this.transactionsModelsList.set(position,transactionsModel);
+       notifyItemChanged(position);
+    }
+
+    public void deleteTransaction(int position,TransactionsModel transactionsModel){
+        this.transactionsModelsList.remove(transactionsModel);
+        notifyItemRemoved(position);
+    }
+
+    public void addItem(int position, TransactionsModel transactionsModel){
+        this.transactionsModelsList.add(position,transactionsModel);
+        notifyItemInserted(position);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.tech.arinzedroid.starchoiceadmin.viewModel;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.tech.arinzedroid.starchoiceadmin.model.AdminModel;
@@ -14,8 +15,6 @@ import com.tech.arinzedroid.starchoiceadmin.repo.AppRepo;
 
 import java.util.List;
 
-import static com.tech.arinzedroid.starchoiceadmin.model.CompletedProducts.*;
-
 public class AppViewModel extends ViewModel {
 
     private AppRepo appRepo;
@@ -27,6 +26,7 @@ public class AppViewModel extends ViewModel {
     private LiveData<List<ClientsModel>> allClientModelLiveData;
     private LiveData<List<ClientsModel>> agentsClientsLiveData;
     private LiveData<List<CompletedProducts>> completedProductsLiveDataList;
+    private MutableLiveData<String> query = new MutableLiveData<>();
 
 
     public  AppViewModel(){
@@ -135,7 +135,7 @@ public class AppViewModel extends ViewModel {
         return appRepo.deleteUserProduct(userProductsModel);
     }
 
-   public LiveData<List<CompletedProducts>> getCompletedProducts(boolean refresh){
+    public LiveData<List<CompletedProducts>> getCompletedProducts(boolean refresh){
         if(!refresh){
             if(completedProductsLiveDataList == null){
                 completedProductsLiveDataList = appRepo.getCompletedProducts();
@@ -146,7 +146,7 @@ public class AppViewModel extends ViewModel {
         return completedProductsLiveDataList;
    }
 
-   public LiveData<List<UserProductsModel>> getUserProducts(String userId, boolean refresh){
+    public LiveData<List<UserProductsModel>> getUserProducts(String userId, boolean refresh){
         if(!refresh){
             if(userProductsList == null){
                 userProductsList = appRepo.getUserProducts(userId);
@@ -157,7 +157,38 @@ public class AppViewModel extends ViewModel {
         return userProductsList;
    }
 
-   public LiveData<Boolean> addUserProducts(List<UserProductsModel> userProductsModels){
+    public LiveData<Boolean> addUserProducts(List<UserProductsModel> userProductsModels){
         return appRepo.addUserProducts(userProductsModels);
    }
+
+    public LiveData<List<TransactionsModel>> getUserTransactionByProduct(String productId, boolean refresh){
+        if(!refresh){
+            if(transactionLiveData == null){
+                transactionLiveData = appRepo.getUserTransactionsByProduct(productId);
+            }
+        }else{
+            transactionLiveData = appRepo.getUserTransactionsByProduct(productId);
+        }
+        return transactionLiveData;
+   }
+
+    public LiveData<Boolean> updateTransactionItem(TransactionsModel transactionsModel){
+        return appRepo.updateTransactionItem(transactionsModel);
+    }
+
+    public LiveData<Boolean> deleteTransactionItem(TransactionsModel transactionsModel){
+        return appRepo.deleteTransactionItem(transactionsModel);
+    }
+
+    public LiveData<String> getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query){
+        this.query.setValue(query);
+    }
+
+    public LiveData<Boolean> updateClient(ClientsModel clientsModel){
+        return appRepo.updateClient(clientsModel);
+    }
 }

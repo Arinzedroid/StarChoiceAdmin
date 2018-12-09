@@ -20,7 +20,7 @@ public class AddProductSectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0){
-            return new AddProductFragment();
+            return AddProductFragment.newInstance(clientsModel);
         }else{
             return SelectProductFragment.newInstance(clientsModel);
         }

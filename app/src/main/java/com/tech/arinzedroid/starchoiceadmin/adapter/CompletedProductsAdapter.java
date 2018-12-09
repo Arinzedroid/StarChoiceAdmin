@@ -16,11 +16,18 @@ import com.tech.arinzedroid.starchoiceadmin.viewHolder.CompletedPaymentsViewHold
 import java.util.List;
 
 public class CompletedProductsAdapter extends RecyclerView.Adapter<CompletedPaymentsViewHolder> {
+    private List<CompletedProducts> completedProductsList; private int count;
 
-   private List<CompletedProducts> completedProductsList; private int count;
     public CompletedProductsAdapter(List<CompletedProducts> completedProductsList){
         this.completedProductsList = completedProductsList;
         count = completedProductsList.size();
+    }
+
+    public void addAll(List<CompletedProducts> completedProductsList){
+        this.completedProductsList.clear();
+        this.completedProductsList = completedProductsList;
+        count = completedProductsList.size();
+        notifyDataSetChanged();
     }
 
     @NonNull
