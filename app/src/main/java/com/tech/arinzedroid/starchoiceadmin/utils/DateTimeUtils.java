@@ -20,11 +20,13 @@ public class DateTimeUtils {
 
     public static boolean isSameDay(Date one, Date two){
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ROOT);
-        return fmt.format(one).equals(fmt.format(two));
+        boolean val = fmt.format(one).equals(fmt.format(two));
+        return val;
     }
 
     public static boolean isDateBefore(Date one, Date two) throws Exception{
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ROOT);
-        return fmt.parse(fmt.format(one)).before(fmt.parse(fmt.format(two)));
+        boolean val = fmt.parse(fmt.format(one)).before(fmt.parse(fmt.format(two)));
+        return val;
     }
 }

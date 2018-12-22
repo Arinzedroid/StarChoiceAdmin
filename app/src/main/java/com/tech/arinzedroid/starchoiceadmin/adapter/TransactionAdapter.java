@@ -2,6 +2,7 @@ package com.tech.arinzedroid.starchoiceadmin.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,7 @@ import java.util.List;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHolder> {
 
     private List<TransactionsModel> transactionsModelsList;
-    private Date date; private TransactionItemClickedInterface transactionItemClickedInterface;
+    private Date date = new Date(); private TransactionItemClickedInterface transactionItemClickedInterface;
     private double totalAmt = 0; private int total = 0,count;
 
     public TransactionAdapter(List<TransactionsModel> transactionsModelsList,
@@ -39,17 +40,23 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHold
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-      compute(holder,position);
+        TransactionsModel data = transactionsModelsList.get(position);
+        holder.amtTv.setText(FormatUtil.formatPrice(data.getAmount()));
+        holder.serialTv.setText(String.valueOf(count - position));
+        holder.statusTv.setText(data.getStatus());
+        holder.dateTv.setText(DateTimeUtils.parseDateTime(data.getDateCreated()));
+
+        calculateDataToDisplay(position,holder);
     }
 
-    private void compute(TransactionViewHolder holder, int position){
+    private void analyseDataAtPosition(TransactionViewHolder holder, int position){
         TransactionsModel data = transactionsModelsList.get(position);
         holder.amtTv.setText(FormatUtil.formatPrice(data.getAmount()));
         holder.serialTv.setText(String.valueOf(count - position));
         holder.statusTv.setText(data.getStatus());
 
-        total++;
-        totalAmt += data.getAmount();
+//        total++;
+//        totalAmt += data.getAmount();
 
         if(position == 0){
             date = data.getDateCreated();
@@ -70,21 +77,34 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHold
         }
     }
 
+    private void generateTotal(Date date){
+        total = 0; totalAmt = 0;
+        for(TransactionsModel trans : transactionsModelsList){
+            if(DateTimeUtils.isSameDay(trans.getDateCreated(),date)){
+                totalAmt = trans.getAmount();
+                total++;
+            }
+        }
+    }
+
+
     private void displayTotal(TransactionViewHolder holder, int position, TransactionsModel data) {
         if(transactionsModelsList.size() > position + 1){
             TransactionsModel data2 = transactionsModelsList.get(position + 1);
             try{
                 if(DateTimeUtils.isDateBefore(data2.getDateCreated(),data.getDateCreated())){
+                    generateTotal(data.getDateCreated());
                     holder.totalAmtTv.setText(FormatUtil.formatPrice(totalAmt));
                     holder.totalSalesTv.setText(String.valueOf(total));
                     holder.itemsLayout3.setVisibility(View.VISIBLE);
-                    total = 0;
-                    totalAmt = 0;
+//                    total = 0;
+//                    totalAmt = 0;
                 }
             }catch (Exception e){
                 Log.e("Adapter","Error >>> ",e);
             }
         }else{
+            //generateTotal(data.getDateCreated());
             holder.totalAmtTv.setText(FormatUtil.formatPrice(totalAmt));
             holder.totalSalesTv.setText(String.valueOf(total));
             holder.itemsLayout3.setVisibility(View.VISIBLE);
@@ -104,6 +124,47 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHold
     public void addItem(int position, TransactionsModel transactionsModel){
         this.transactionsModelsList.add(position,transactionsModel);
         notifyItemInserted(position);
+    }
+
+    private void calculateDataToDisplay(int position, TransactionViewHolder holder){
+        Date first_date  = transactionsModelsList.get(position).getDateCreated();
+
+        //check that the last visible item is not the last item in the list.
+        //if yes calculate and display totals
+        if(position + 1 < transactionsModelsList.size()){
+            Date second_date = transactionsModelsList.get(position + 1).getDateCreated();
+            if(DateTimeUtils.isSameDay(second_date,first_date)){
+                holder.itemsLayout3.setVisibility(View.GONE);
+                //check this is not the first item so as to hide the date textview
+                if(position != 0){
+                    holder.itemsLayout1.setVisibility(View.GONE);
+                }
+            }else {
+                try {
+                    if(DateTimeUtils.isDateBefore(second_date,first_date)){
+                        holder.itemsLayout3.setVisibility(View.VISIBLE);
+                        computeAndDisplayTotals(first_date,holder);
+                        //date = second_date;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            computeAndDisplayTotals(first_date,holder);
+        }
+    }
+
+    private void computeAndDisplayTotals(Date date, TransactionViewHolder holder){
+        int totalNo = 0; double totalAmt = 0;
+        for (TransactionsModel transModel : transactionsModelsList) {
+            if(DateTimeUtils.isSameDay(transModel.getDateCreated(),date)){
+                totalNo++;
+                totalAmt += transModel.getAmount();
+            }
+        }
+        holder.totalSalesTv.setText(String.valueOf(totalNo));
+        holder.totalAmtTv.setText(FormatUtil.formatPrice(totalAmt));
     }
 
     @Override

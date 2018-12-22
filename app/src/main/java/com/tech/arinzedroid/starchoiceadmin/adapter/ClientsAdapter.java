@@ -20,21 +20,21 @@ import java.util.List;
 
 public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
 
-    private List<ClientsModel> _clientsModelList;
+    private List<ClientsModel> clientsModelList;
     private DeleteClientInterface deleteClientInterface;
     private ClientItemClickedInterface clientItemClickedInterface;
     private int total = 0; private double totalAmt = 0; private Date date; private int count;
 
     public ClientsAdapter(List<ClientsModel> clientsModelsList, DeleteClientInterface deleteClientInterface,
                           ClientItemClickedInterface clientItemClickedInterface){
-        this._clientsModelList = clientsModelsList; count = clientsModelsList.size();
+        this.clientsModelList = clientsModelsList; count = clientsModelsList.size();
         this.deleteClientInterface = deleteClientInterface;
         this.clientItemClickedInterface = clientItemClickedInterface;
     }
 
     public void addAll(List<ClientsModel> clientsModels){
-        _clientsModelList.clear();
-        _clientsModelList.addAll(clientsModels);
+        clientsModelList.clear();
+        clientsModelList.addAll(clientsModels);
         count = clientsModels.size();
         notifyDataSetChanged();
     }
@@ -48,11 +48,17 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ClientViewHolder holder, int position) {
-        computeAndDisplayViews(holder,position);
+        ClientsModel data = clientsModelList.get(position);
+        holder.nameTv.setText(data.getFullname());
+        holder.clientDateCreatedTv.setText(DateTimeUtils.parseDateTime(data.getDateCreated()));
+        holder.serialTv.setText(String.valueOf(count - position));
+
+        calculateDataToDisplay(position,holder);
+        //computeAndDisplayViews(holder,position);
     }
 
     private void computeAndDisplayViews(ClientViewHolder holder, int position){
-        ClientsModel data = _clientsModelList.get(position);
+        ClientsModel data = clientsModelList.get(position);
         holder.nameTv.setText(data.getFullname());
         holder.clientDateCreatedTv.setText(DateTimeUtils.parseDateTime(data.getDateCreated()));
         holder.serialTv.setText(String.valueOf(count - position));
@@ -80,8 +86,8 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
     }
 
     private void displayTotalsView(ClientViewHolder holder, int position, ClientsModel data) {
-        if(_clientsModelList.size() > position + 1){
-            ClientsModel data2 = _clientsModelList.get(position + 1);
+        if(clientsModelList.size() > position + 1){
+            ClientsModel data2 = clientsModelList.get(position + 1);
             try{
                 if(DateTimeUtils.isDateBefore(data2.getDateCreated(),data.getDateCreated())){
                     holder.totalAmtTv.setText(FormatUtil.formatPrice(totalAmt));
@@ -100,8 +106,49 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientViewHolder> {
         }
     }
 
+    private void calculateDataToDisplay(int position, ClientViewHolder holder){
+        Date first_date  = clientsModelList.get(position).getDateCreated();
+
+        //check that the last visible item is not the last item in the list.
+        //if yes calculate and display totals
+        if(position + 1 < clientsModelList.size()){
+            Date second_date = clientsModelList.get(position + 1).getDateCreated();
+            if(DateTimeUtils.isSameDay(second_date,first_date)){
+                holder.itemsLayout3.setVisibility(View.GONE);
+                //check this is not the first item so as to hide the date textview
+                if(position != 0){
+                    holder.itemsLayout1.setVisibility(View.GONE);
+                }
+            }else {
+                try {
+                    if(DateTimeUtils.isDateBefore(second_date,first_date)){
+                        holder.itemsLayout3.setVisibility(View.VISIBLE);
+                        computeAndDisplayTotals(first_date,holder);
+                        //date = second_date;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            computeAndDisplayTotals(first_date,holder);
+        }
+    }
+
+    private void computeAndDisplayTotals(Date date, ClientViewHolder holder){
+        int totalNo = 0; double totalAmt = 0;
+        for (ClientsModel clientsModel : clientsModelList) {
+            if(DateTimeUtils.isSameDay(clientsModel.getDateCreated(),date)){
+                totalNo++;
+                totalAmt += clientsModel.getTotalAmount();
+            }
+        }
+        holder.totalClientsTv.setText(String.valueOf(totalNo));
+        holder.totalAmtTv.setText(FormatUtil.formatPrice(totalAmt));
+    }
+
     @Override
     public int getItemCount() {
-        return _clientsModelList.size();
+        return clientsModelList.size();
     }
 }

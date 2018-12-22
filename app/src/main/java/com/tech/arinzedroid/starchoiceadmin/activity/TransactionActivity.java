@@ -68,7 +68,7 @@ public class TransactionActivity extends AppCompatActivity implements
             if(isEdit){
                 userProductsModel = Parcels.unwrap(intent.getParcelableExtra(Constants.PRODUCT_DATA));
                 if(userProductsModel != null){
-                    loadDataByProduct(userProductsModel.getProductId(),false);
+                    loadDataByProduct(userProductsModel.getProductId(),userProductsModel.getUserId(),false);
                 }else{
                     Toast.makeText(this, "Invalid product selected", Toast.LENGTH_SHORT).show();
                 }
@@ -113,9 +113,9 @@ public class TransactionActivity extends AppCompatActivity implements
         });
     }
 
-    private void loadDataByProduct(String productId, boolean refresh){
+    private void loadDataByProduct(String productId,String userId, boolean refresh){
         swipeRefreshLayout.setRefreshing(true);
-        appViewModel.getUserTransactionByProduct(productId,refresh).observe(this,
+        appViewModel.getUserTransactionByProduct(productId,userId,refresh).observe(this,
                 transactionsModels -> {
             swipeRefreshLayout.setRefreshing(false);
             if(transactionsModels != null && !transactionsModels.isEmpty()){
@@ -129,7 +129,7 @@ public class TransactionActivity extends AppCompatActivity implements
     @Override
     public void onRefresh() {
         if(isEdit){
-            loadDataByProduct(userProductsModel.getProductId(),true);
+            loadDataByProduct(userProductsModel.getProductId(),userProductsModel.getUserId(),true);
         }else{
             if(isAllTransactions)
                 loadData(true);
@@ -146,6 +146,7 @@ public class TransactionActivity extends AppCompatActivity implements
         appViewModel.deleteTransactionItem(transactionsModel).observe(this, isSuccessful -> {
             if(isSuccessful != null && isSuccessful){
                 Toast.makeText(this, "Transaction has been deleted successfully", Toast.LENGTH_SHORT).show();
+                onRefresh();
             }else{
                 Toast.makeText(this, "Deleting transaction failed.", Toast.LENGTH_SHORT).show();
             }
@@ -157,8 +158,19 @@ public class TransactionActivity extends AppCompatActivity implements
         if(adapter != null){
             adapter.updateTransaction(position,transactionsModel);
         }
-        appViewModel.updateTransactionItem(transactionsModel).observe(this, isSuccessful -> {
+        //set new price to amt paid in user Product
+        userProductsModel.setAmtPaid(transactionsModel.getAmount());
+
+        //determine is user has paid fully for this product
+        if(userProductsModel.getProductModel() != null){
+            double amt = userProductsModel.getProductModel().getPrice();
+            if(transactionsModel.getAmount() >= amt){
+                userProductsModel.setPaidFully(true);
+            }
+        }
+        appViewModel.updateTransactionItem(transactionsModel,userProductsModel).observe(this, isSuccessful -> {
             if(isSuccessful != null && isSuccessful){
+                onRefresh();
                 Toast.makeText(this, "Transaction has been updated successfully", Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(this, "Updating transaction failed.", Toast.LENGTH_SHORT).show();

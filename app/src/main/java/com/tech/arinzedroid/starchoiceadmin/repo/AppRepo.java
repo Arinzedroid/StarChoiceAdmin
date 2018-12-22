@@ -17,6 +17,7 @@ import com.tech.arinzedroid.starchoiceadmin.model.TransactionsModel;
 import com.tech.arinzedroid.starchoiceadmin.model.UserProductsModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,13 +192,24 @@ public class AppRepo {
 
     }
 
-    public LiveData<Boolean> updateTransactionItem(TransactionsModel transactionsModel){
+    public LiveData<Boolean> updateTransactionItem(TransactionsModel transactionsModel,
+                                                   UserProductsModel userProductsModel){
         final MutableLiveData<Boolean> isSuccessful = new MutableLiveData<>();
         Map<String,Object> data = new HashMap<>();
         data.put("amount",transactionsModel.getAmount());
         firestoreDb.collection(TRANS_HISTORY_TABLE).document(transactionsModel.getId())
                 .update(data)
-                .addOnSuccessListener(task -> isSuccessful.postValue(true))
+                .addOnSuccessListener(task ->{
+                    isSuccessful.postValue(true);
+                    Map<String,Object> data_ = new HashMap<>();
+
+                    data_.put("paidFully",userProductsModel.isPaidFully());
+                    data_.put("amtPaid",userProductsModel.getAmtPaid());
+                    data_.put("dateUpdated",new Date());
+
+                    firestoreDb.collection(USER_PRODUCTS).document(userProductsModel.getId())
+                            .update(data_);
+                })
                 .addOnFailureListener(task -> isSuccessful.postValue(false));
         return isSuccessful;
     }
@@ -370,11 +382,12 @@ public class AppRepo {
         return success;
     }
 
-    public LiveData<List<TransactionsModel>> getUserTransactionsByProduct(String productId){
+    public LiveData<List<TransactionsModel>> getUserTransactionsByProduct(String productId, String userId){
         final MutableLiveData<List<TransactionsModel>> mutableLiveData = new MutableLiveData<>();
         List<TransactionsModel> transactionsModels = new ArrayList<>();
         firestoreDb.collection(TRANS_HISTORY_TABLE)
                 .whereEqualTo("productId",productId)
+                .whereEqualTo("userId",userId)
                 .orderBy(DATE_CREATED,Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {

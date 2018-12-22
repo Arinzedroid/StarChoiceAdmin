@@ -161,19 +161,20 @@ public class AppViewModel extends ViewModel {
         return appRepo.addUserProducts(userProductsModels);
    }
 
-    public LiveData<List<TransactionsModel>> getUserTransactionByProduct(String productId, boolean refresh){
+    public LiveData<List<TransactionsModel>> getUserTransactionByProduct(String productId,String userId, boolean refresh){
         if(!refresh){
             if(transactionLiveData == null){
-                transactionLiveData = appRepo.getUserTransactionsByProduct(productId);
+                transactionLiveData = appRepo.getUserTransactionsByProduct(productId,userId);
             }
         }else{
-            transactionLiveData = appRepo.getUserTransactionsByProduct(productId);
+            transactionLiveData = appRepo.getUserTransactionsByProduct(productId,userId);
         }
         return transactionLiveData;
    }
 
-    public LiveData<Boolean> updateTransactionItem(TransactionsModel transactionsModel){
-        return appRepo.updateTransactionItem(transactionsModel);
+    public LiveData<Boolean> updateTransactionItem(TransactionsModel transactionsModel,
+                                                   UserProductsModel userProductsModel){
+        return appRepo.updateTransactionItem(transactionsModel,userProductsModel);
     }
 
     public LiveData<Boolean> deleteTransactionItem(TransactionsModel transactionsModel){
